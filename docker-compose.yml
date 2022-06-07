@@ -1,0 +1,9 @@
+version: '3'
+services:
+  cosmos-phase1:
+    image: stoplight/prism
+    ports:
+      - 4010:4010
+    volumes:
+      - ./apis/cosmos-phase1.yml:/app/swagger-spec.yaml
+    command: mock -h 0.0.0.0 -d /app/swagger-spec.yaml

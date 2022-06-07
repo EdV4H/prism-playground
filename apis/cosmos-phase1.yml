@@ -1,0 +1,740 @@
+openapi: 3.1.0
+info:
+  title: cosmos-phase1
+  version: '1.0'
+servers:
+  - url: 'http://localhost:3000'
+paths:
+  /estimates:
+    get:
+      summary: 見積一覧取得API
+      tags: []
+      responses:
+        '200':
+          $ref: '#/components/responses/ListEstimateResDto'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      operationId: get-estimates
+      parameters:
+        - $ref: '#/components/parameters/baseIdRequired'
+        - $ref: '#/components/parameters/keywordOptional'
+        - $ref: '#/components/parameters/limitRequired'
+        - $ref: '#/components/parameters/offsetRequired'
+        - $ref: '#/components/parameters/estimateStatusOptional'
+        - $ref: '#/components/parameters/estimateSortOptional'
+  '/estimates/{estimateId}/accept':
+    parameters:
+      - $ref: '#/components/parameters/estimateId'
+    get:
+      summary: 受失注入力
+      tags: []
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+      operationId: get-estimates-estimateId-accept
+  '/estimates/{estimatedId}':
+    parameters:
+      - $ref: '#/components/parameters/Cosmos-api_EstimateId'
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses: {}
+      operationId: get-estimates-estimatedId
+  /items/categories:
+    get:
+      summary: 商品カテゴリ一覧取得
+      tags: []
+      responses:
+        '200':
+          $ref: '#/components/responses/ListEstimateItemCategoriesResDto'
+      operationId: get-items-categories
+  /items:
+    get:
+      summary: 商品一覧取得
+      tags: []
+      responses:
+        '200':
+          $ref: '#/components/responses/ListEstimateItemResDto'
+      operationId: get-items
+      parameters:
+        - $ref: '#/components/parameters/keywordOptional'
+        - $ref: '#/components/parameters/secondaryCategoryIdOptional'
+        - $ref: '#/components/parameters/limitRequired'
+        - $ref: '#/components/parameters/offsetRequired'
+components:
+  schemas:
+    Pagination:
+      title: Pagination
+      type: object
+      properties:
+        count:
+          type: integer
+          minimum: 0
+          description: 検索対象総数
+          readOnly: true
+      required:
+        - count
+    EstimateListItem:
+      title: EstimateListItem
+      type: object
+      properties:
+        id:
+          type: integer
+          minimum: 0
+          description: 見積書ID
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/EstimateStatus'
+        name:
+          type: string
+          description: 案件名
+        storeType:
+          $ref: '#/components/schemas/StoreType'
+        storeName:
+          type: string
+          description: 販売店名
+        storeOfficeName:
+          type: string
+          description: 営業所名
+        storeEmployeeName:
+          type: string
+          description: 担当者名
+        estimatedDate:
+          type: string
+          format: date-time
+          description: 見積年月日
+        user:
+          type: string
+          description: ユーザー
+        onSiteName:
+          type: string
+          description: 現場名
+        price:
+          type: integer
+          minimum: 0
+          description: 金額
+        baseId:
+          type: integer
+          minimum: 0
+          description: 登録管理拠点ID
+        employee:
+          type: string
+          description: 自社担当
+      required:
+        - id
+        - status
+        - name
+        - storeType
+        - storeName
+        - storeOfficeName
+        - storeEmployeeName
+        - estimatedDate
+        - user
+        - onSiteName
+        - price
+        - baseId
+        - employee
+    EstimateStatus:
+      type: string
+      title: EstimateStatus
+      description: 商談ステータス
+      enum:
+        - UNCONSTRAINT
+        - DRAFT
+        - INESTIMATE
+        - CONSTRAINT
+        - CLRMSALIGNMENT
+    Estimate:
+      title: Estimate
+      type: object
+      properties:
+        id:
+          type: integer
+          minimum: 0
+          description: 見積ID
+          readOnly: true
+        dealId:
+          type: integer
+          minimum: 0
+          description: 商談ID
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/EstimateStatus'
+        user:
+          type: string
+          description: ユーザ
+        onSiteName:
+          type: string
+          description: 現場名
+        onSiteTel:
+          type: string
+          description: 現場電話番号
+        onSiteFax:
+          type: string
+          description: 現場FAX番号
+        estimatedDate:
+          type: string
+          format: date
+          description: 見積年月日
+        estimatedEffectiveDate:
+          type: string
+          format: date
+          description: 見積期限
+        employeeId:
+          type: integer
+          description: 担当者ID
+          minimum: 0
+        deliveryDate:
+          type: string
+          description: 納品日
+          format: date
+        deliveryTime:
+          type: string
+          description: 納品時刻
+        deliveryStartDate:
+          type: string
+          description: 納品開始時刻
+        deliveryEndDate:
+          type: string
+          description: 納品終了時刻
+        withdrawalDate:
+          type: string
+          format: date
+          description: 引上日
+        withdrawalTime:
+          type: string
+          description: 引上時刻
+        withdrawalStartDate:
+          type: string
+          description: 引上開始時刻
+        withdrawalEndDate:
+          type: string
+          description: 引上終了時刻
+        deliveryZipCode:
+          type: string
+          description: 納品先郵便番号
+        deliveryState:
+          type: string
+          description: 納品先都道府県
+        deliverMunicipalities:
+          type: string
+          description: 納品先市区町村
+        deliveryAddress:
+          type: string
+          description: 納品先住所
+        rentalPeriodPattern:
+          $ref: '#/components/schemas/RentalPeriodPattern'
+        rentalDate:
+          type: integer
+          minimum: 0
+          description: レンタル日数
+        rentalStartDate:
+          type: string
+          format: date
+          description: レンタル開始日
+        rentalEndDate:
+          type: string
+          format: date
+          description: レンタル終了日
+        paymentTerms:
+          $ref: '#/components/schemas/PaymentTerms'
+        tax:
+          $ref: '#/components/schemas/TaxType'
+        calcuratePattern:
+          $ref: '#/components/schemas/CaluculatePattern'
+        note:
+          type: string
+          description: 備考情報
+        note2:
+          type: string
+          description: 注意事項
+        execBaseId:
+          type: integer
+          description: 登録管理拠点ID
+          minimum: 0
+        deptpatternId:
+          type: integer
+          description: 売上部門パターンID
+          minimum: 0
+        billStartDate:
+          type: string
+          description: 請求開始日
+          format: date
+        billEndDate:
+          type: string
+          description: 請求終了日
+          format: date
+        orderDate:
+          type: string
+          description: 納品日
+          format: date
+        workReportNote:
+          type: string
+          description: 作業報告書特記事項
+        loadingTableNote:
+          type: string
+          description: 積込表連絡事項
+        inOutPattern:
+          $ref: '#/components/schemas/InOutPattern'
+        deliveryPattern:
+          $ref: '#/components/schemas/DeliveryPattern'
+        ownFlightPattern:
+          $ref: '#/components/schemas/OwnFlightPattern'
+        inOutStartTimeSlot:
+          $ref: '#/components/schemas/TimeSlot'
+        inOutEndTimeSlot:
+          $ref: '#/components/schemas/TimeSlot'
+      required:
+        - id
+        - dealId
+    EstimateItemMaster:
+      title: 商品マスタ
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 商品ID
+          minimum: 0
+          readOnly: true
+        name:
+          type: string
+          description: 商品名
+          readOnly: true
+        itemId:
+          type: integer
+          description: CLRMS連携ID
+          minimum: 0
+          readOnly: true
+        note:
+          type: string
+          description: 備考
+          readOnly: true
+        note2:
+          type: string
+          description: 注意書き
+          readOnly: true
+        installationCost:
+          type: integer
+          description: 設置費
+        deliveryCost:
+          type: integer
+          description: 宅配料金（片道）
+        loadingPoint:
+          type: integer
+          description: 積載ポイント
+        loadingWholesalerPrice:
+          type: string
+          description: 積載料金（卸）
+        loadingDirectPrice:
+          type: string
+          description: 積載料金（直）
+        secondCategoryId:
+          type: integer
+          minimum: 0
+          description: 第二階層カテゴリID
+          readOnly: true
+        cmFlg:
+          type: boolean
+          description: 暦月商品フラグ
+          readOnly: true
+        itemPrice:
+          type: array
+          items:
+            $ref: '#/components/schemas/EstimateItemPriceMaster'
+      required:
+        - id
+        - name
+        - itemId
+        - secondCategoryId
+        - cmFlg
+    EstimateItem:
+      title: EstimateItem
+      type: object
+      properties:
+        id:
+          type: string
+        count:
+          type: string
+        price:
+          type: string
+        viewOrder:
+          type: string
+        name:
+          type: string
+        itemId:
+          type: string
+        note:
+          type: string
+        note2:
+          type: string
+        installationCost:
+          type: string
+        deliveryCost:
+          type: string
+        loadingPoint:
+          type: string
+        cmFlg:
+          type: string
+        itemPrices:
+          type: string
+    EstimateItemPriceMaster:
+      title: EstimateItemPriceMaster
+      type: object
+      properties:
+        grade:
+          $ref: '#/components/schemas/WholesalerGrade'
+        itemPricePattern:
+          $ref: '#/components/schemas/ItemPricePattern'
+        shotPrice:
+          type: integer
+          readOnly: true
+        oneDayPrice:
+          type: integer
+          readOnly: true
+        oneWeekPrice:
+          type: integer
+          readOnly: true
+        oneMonthPrice:
+          type: integer
+          readOnly: true
+        sixMonthPrice:
+          type: integer
+          readOnly: true
+        oneYearPrice:
+          type: integer
+          readOnly: true
+        twoYearPrice:
+          type: integer
+          readOnly: true
+        threeYearPrice:
+          type: integer
+          readOnly: true
+        fourYearPrice:
+          type: integer
+          readOnly: true
+        ficeYearPrice:
+          type: integer
+          readOnly: true
+      required:
+        - grade
+        - itemPricePattern
+        - shotPrice
+        - oneDayPrice
+        - oneWeekPrice
+        - oneMonthPrice
+        - sixMonthPrice
+        - oneYearPrice
+        - twoYearPrice
+        - threeYearPrice
+        - fourYearPrice
+        - ficeYearPrice
+    StoreType:
+      type: string
+      title: StoreType
+      enum:
+        - WHOLESALE
+        - DIRECT
+      description: 販売店タイプ
+    AcceptRejectStatus:
+      type: string
+      title: AcceptRejectStatus
+      enum:
+        - ACCEPT
+        - REJECT
+    RentalPeriodPattern:
+      type: string
+      title: RentalPeriodPattern
+      enum:
+        - DAY
+        - MONTH
+        - PERIOD
+      description: レンタル期間パターン
+    PaymentTerms:
+      type: string
+      title: PaymentTerms
+      description: 支払い条件
+      enum:
+        - SEPARATEMTG
+        - NORMAL
+        - EOMPAYLDOM
+        - EOMPAYNEXTLDOM
+        - TWENTYTHPAY20THOM
+        - TWENTYTHPAYLDOM
+    TaxType:
+      type: string
+      title: TaxType
+      description: 税抜き・税込み
+      enum:
+        - INCLUDE
+        - EXCLUDE
+    CaluculatePattern:
+      type: string
+      title: CaluculatePattern
+      description: 算出方法
+      enum:
+        - MONTH
+        - DAILY
+        - MONTHANDDAILY
+        - MONTHKIRISUTE
+    InOutPattern:
+      type: string
+      title: InOutPattern
+      description: 搬入搬出パターン
+      enum:
+        - Delivery
+        - OwnFlight
+        - RecievedVist
+    DeliveryPattern:
+      type: string
+      title: DeliveryPattern
+      description: 宅配パターン
+      enum:
+        - ONEWAY
+        - ROUNDTRIP
+    OwnFlightPattern:
+      type: string
+      title: OwnFlightPattern
+      description: 自社便パターン
+      enum:
+        - IN
+        - OUT
+        - INOUT
+    TimeSlot:
+      type: string
+      title: TimeSlot
+      description: 時間帯パターン
+      enum:
+        - DAYTIME
+        - EVENING
+        - MIDNIGHT
+        - EARLY＿MORNING
+    EstimateItemCategory:
+      title: 商品カテゴリ
+      type: object
+      properties:
+        id:
+          type: integer
+          minimum: 0
+          description: カテゴリID
+          readOnly: true
+        name:
+          type: string
+          description: カテゴリ名
+          readOnly: true
+      required:
+        - id
+        - name
+    WholesalerGrade:
+      type: string
+      title: WholesalerGrade
+      description: 卸店グレード
+      enum:
+        - DIRECT
+        - WHOLESALER_1
+        - WHOLESALER_2
+        - WHOLESALER_3
+        - WHOLESALER_4
+        - WHOLESALER_5
+        - WHOLESALER_6
+        - WHOLESALER_7
+        - WHOLESALER_8
+        - WHOLESALER_9
+        - WHOLESALER_10
+    ItemPricePattern:
+      type: string
+      title: ItemPricePattern
+      description: 商品価格パターン
+      enum:
+        - RENTAL
+        - SALE
+        - WORK
+  parameters:
+    baseIdRequired:
+      name: baseId
+      in: query
+      required: true
+      schema:
+        type: string
+      description: 登録管理拠点ID
+    keywordRequired:
+      name: keyword
+      in: query
+      required: true
+      schema:
+        type: string
+      description: 検索キーワード
+    estimateStatusRequired:
+      name: status
+      in: query
+      required: true
+      schema:
+        type: string
+        enum:
+          - UNCONSTRAINT
+          - DRAFT
+          - INESTIMATE
+          - CONSTRAINT
+          - CLRMSALIGNMENT
+      description: 見積ステータス
+    limitRequired:
+      name: limit
+      in: query
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+      description: 取得上限数
+    offsetRequired:
+      name: offset
+      in: query
+      required: true
+      schema:
+        type: integer
+        minimum: 0
+      description: 検索オフセット
+    keywordOptional:
+      name: keyword
+      in: query
+      required: false
+      schema:
+        type: string
+      description: 検索キーワード
+    estimateSortOptional:
+      name: sort
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - lastUpdate
+          - price
+      description: 見積書一覧ソート
+    estimateStatusOptional:
+      name: status
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - UNCONSTRAINT
+          - DRAFT
+          - INESTIMATE
+          - CONSTRAINT
+          - CLRMSALIGNMENT
+      description: 見積ステータス
+    estimateId:
+      name: estimateId
+      in: path
+      required: true
+      schema:
+        type: number
+        minimum: 0
+      description: 見積書ID
+    secondaryCategoryIdOptional:
+      name: secondaryCategoryId
+      in: query
+      schema:
+        type: number
+        minimum: 0
+      description: 第二階層カテゴリID
+    Cosmos-api_EstimateId:
+      name: estimateId
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 0
+      description: 見積ID
+  responses:
+    ListEstimateResDto:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            allOf:
+              - type: object
+                properties:
+                  estimates:
+                    type: array
+                    description: 見積書一覧
+                    items:
+                      $ref: '#/components/schemas/EstimateListItem'
+                required:
+                  - estimates
+              - $ref: '#/components/schemas/Pagination'
+          examples: {}
+    ListEstimateItemCategoriesResDto:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              firstCategory:
+                type: array
+                description: 第一階層一覧
+                items:
+                  allOf:
+                    - $ref: '#/components/schemas/EstimateItemCategory'
+                    - type: object
+                      properties:
+                        secondCategories:
+                          type: array
+                          description: 第二階層一覧
+                          items:
+                            $ref: '#/components/schemas/EstimateItemCategory'
+                      required:
+                        - secondCategories
+            required:
+              - firstCategory
+          examples:
+            example-1:
+              value:
+                firstCategory:
+                  - id: 1
+                    name: ノートパソコン
+                    secondCategories:
+                      - id: 1
+                        name: ノートパソコン　Core i5 モデル
+                      - id: 2
+                        name: ノートパソコン　Core i5 Office Personalモデル
+                      - id: 3
+                        name: ノートパソコン　Core i5 Office H&Bモデル
+                  - id: 2
+                    name: ChromeOS パソコン
+                    secondCategories: []
+    ListEstimateItemResDto:
+      description: Example response
+      content:
+        application/json:
+          schema:
+            allOf:
+              - type: object
+                properties:
+                  items:
+                    type: array
+                    description: 商品一覧
+                    items:
+                      $ref: '#/components/schemas/EstimateItemMaster'
+                required:
+                  - items
+              - $ref: '#/components/schemas/Pagination'
